@@ -2,90 +2,75 @@ export default {
   namespaced: true,
   state: {
     morfos: [],
-    morfoActivo: null
+    morfoSeleccionado: null
   },
   mutations: {
-    AGREGAR_MORFO(state, morfo) {
-      state.morfos.push({
-        id: crypto.randomUUID(),
-        ...morfo,
-        atributosFisicos: {
-          fuerza: 0,
-          destreza: 0,
-          resistencia: 0
-        },
-        tamanio: 0,
-        limitadoresHabilidades: {},
-        ventajasFisicas: [],
-        desventajasFisicas: [],
-        salud: { base: 0 },
-        caracteristicaDual: {
-          nombre1: "Humanidad",
-          valor1: 7,
-          nombre2: "Corrupcion",
-          valor2: 3
+    SET_MORFO_SELECCIONADO(state, morfo) {
+      state.morfoSeleccionado = morfo
+    },
+    CARGAR_MORFOS(state, morfos) {
+      state.morfos = morfos
+    },
+    ACTUALIZAR_MORFO(state, morfo) {
+      const index = state.morfos.findIndex(m => m.id === morfo.id)
+      if (index !== -1) {
+        state.morfos.splice(index, 1, morfo)
+        if (state.morfoSeleccionado?.id === morfo.id) {
+          state.morfoSeleccionado = morfo
         }
-      })
-    },
-    ELIMINAR_MORFO(state, morfoId) {
-      state.morfos = state.morfos.filter(m => m.id !== morfoId)
-      if (state.morfoActivo === morfoId) {
-        state.morfoActivo = null
-      }
-    },
-    ACTUALIZAR_MORFO(state, { morfoId, campo, valor }) {
-      const morfo = state.morfos.find(m => m.id === morfoId)
-      if (morfo) {
-        if (campo.includes('.')) {
-          const [padre, hijo] = campo.split('.')
-          morfo[padre][hijo] = valor
-        } else {
-          morfo[campo] = valor
-        }
-      }
-    },
-    ESTABLECER_MORFO_ACTIVO(state, morfoId) {
-      state.morfoActivo = morfoId
-    },
-    AGREGAR_LIMITADOR(state, { morfoId, habilidad, limitador }) {
-      const morfo = state.morfos.find(m => m.id === morfoId)
-      if (morfo) {
-        morfo.limitadoresHabilidades[habilidad] = limitador
-      }
-    },
-    ELIMINAR_LIMITADOR(state, { morfoId, habilidad }) {
-      const morfo = state.morfos.find(m => m.id === morfoId)
-      if (morfo) {
-        delete morfo.limitadoresHabilidades[habilidad]
       }
     }
   },
   actions: {
-    agregarMorfo({ commit }, morfo) {
-      commit('AGREGAR_MORFO', morfo)
+    agregarMorfo({ commit, state }, morfo) {
+      const nuevoMorfo = {
+        id: Date.now().toString(),
+        ventajasFisicas: [],
+        desventajasFisicas: [],
+        limitadoresHabilidades: [],
+        caracteristicasDuales: [],
+        poderes: [],
+        equipo: [],
+        armas: [],
+        habilidades: [],
+        notas: [],
+        estadisticas: [],
+        ...morfo
+      }
+      state.morfos.push(nuevoMorfo)
+      localStorage.setItem('morfos', JSON.stringify(state.morfos))
     },
-    eliminarMorfo({ commit }, morfoId) {
-      commit('ELIMINAR_MORFO', morfoId)
+    actualizarMorfo({ commit, state }, morfo) {
+      commit('ACTUALIZAR_MORFO', morfo)
+      localStorage.setItem('morfos', JSON.stringify(state.morfos))
     },
-    actualizarMorfo({ commit }, payload) {
-      commit('ACTUALIZAR_MORFO', payload)
+    eliminarMorfo({ commit, state }, id) {
+      state.morfos = state.morfos.filter(m => m.id !== id)
+      if (state.morfoSeleccionado?.id === id) {
+        state.morfoSeleccionado = null
+      }
+      localStorage.setItem('morfos', JSON.stringify(state.morfos))
     },
-    establecerMorfoActivo({ commit }, morfoId) {
-      commit('ESTABLECER_MORFO_ACTIVO', morfoId)
+    cargarMorfos({ commit }) {
+      const morfosGuardados = localStorage.getItem('morfos')
+      if (morfosGuardados) {
+        commit('CARGAR_MORFOS', JSON.parse(morfosGuardados))
+      }
     },
-    agregarLimitador({ commit }, payload) {
-      commit('AGREGAR_LIMITADOR', payload)
-    },
-    eliminarLimitador({ commit }, payload) {
-      commit('ELIMINAR_LIMITADOR', payload)
+    seleccionarMorfo({ commit, state }, id) {
+      const morfo = state.morfos.find(m => m.id === id)
+      commit('SET_MORFO_SELECCIONADO', morfo || null)
     }
   },
   getters: {
-    obtenerMorfos: state => state.morfos,
-    obtenerMorfoActivo: state => state.morfos.find(m => m.id === state.morfoActivo),
-    obtenerLimitadores: state => morfoId => {
-      const morfo = state.morfos.find(m => m.id === morfoId)
-      return morfo ? morfo.limitadoresHabilidades : {}
+    getMorfoById: (state) => (id) => {
+      return state.morfos.find(m => m.id === id)
+    },
+    getMorfoSeleccionado: (state) => {
+      return state.morfoSeleccionado
+    },
+    getMorfosDisponibles: (state) => {
+      return state.morfos
     }
   }
 } 

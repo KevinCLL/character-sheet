@@ -16,6 +16,16 @@
       </div>
     </section>
 
+    <!-- Méritos -->
+    <section class="mb-12">
+      <Meritos />
+    </section>
+
+    <!-- Defectos -->
+    <section class="mb-12">
+      <Defectos />
+    </section>
+
     <!-- Características Duales -->
     <section class="mb-12">
       <CaracteristicasDuales />
@@ -32,5 +42,7 @@ export default {
 <script setup>
 import Atributos from '@/components/ego/Atributos.vue'
 import GrupoHabilidades from '@/components/ego/GrupoHabilidades.vue'
+import Meritos from '@/components/ego/Meritos.vue'
+import Defectos from '@/components/ego/Defectos.vue'
 import CaracteristicasDuales from '@/components/ego/CaracteristicasDuales.vue'
 </script> 

@@ -3,78 +3,43 @@ export default {
   state: {
     atributos: {
       mentales: [
-        { id: 'intelecto', nombre: 'Intelecto', valor: 1 },
-        { id: 'astucia', nombre: 'Astucia', valor: 1 },
-        { id: 'determinacion', nombre: 'Determinación', valor: 1 }
+        { id: 'poder', nombre: 'Poder', valor: 3 },
+        { id: 'destreza', nombre: 'Destreza', valor: 3 },
+        { id: 'resiliencia', nombre: 'Resiliencia', valor: 3 }
       ],
       sociales: [
-        { id: 'presencia', nombre: 'Presencia', valor: 1 },
-        { id: 'manipulacion', nombre: 'Manipulación', valor: 1 },
-        { id: 'compostura', nombre: 'Compostura', valor: 1 }
+        { id: 'poder', nombre: 'Poder', valor: 3 },
+        { id: 'destreza', nombre: 'Destreza', valor: 3 },
+        { id: 'resiliencia', nombre: 'Resiliencia', valor: 3 }
       ],
       fisicos: [
-        { id: 'fuerza', nombre: 'Fuerza', valor: 1 },
-        { id: 'destreza', nombre: 'Destreza', valor: 1 },
-        { id: 'resistencia', nombre: 'Resistencia', valor: 1 }
+        { id: 'poder', nombre: 'Poder', valor: 3 },
+        { id: 'destreza', nombre: 'Destreza', valor: 3 },
+        { id: 'resiliencia', nombre: 'Resiliencia', valor: 3 }
       ]
     },
     habilidades: {
       mentales: [
         {
-          nombre: 'Académicas',
-          habilidades: [
-            { id: 'ciencias', nombre: 'Ciencias', valor: 0 },
-            { id: 'humanidades', nombre: 'Humanidades', valor: 0 },
-            { id: 'medicina', nombre: 'Medicina', valor: 0 }
-          ]
-        },
-        {
-          nombre: 'Técnicas',
-          habilidades: [
-            { id: 'informatica', nombre: 'Informática', valor: 0 },
-            { id: 'ingenieria', nombre: 'Ingeniería', valor: 0 },
-            { id: 'investigacion', nombre: 'Investigación', valor: 0 }
-          ]
+          nombre: 'Mentales',
+          habilidades: []
         }
       ],
       sociales: [
         {
-          nombre: 'Comunicación',
-          habilidades: [
-            { id: 'empatia', nombre: 'Empatía', valor: 0 },
-            { id: 'expresion', nombre: 'Expresión', valor: 0 },
-            { id: 'persuasion', nombre: 'Persuasión', valor: 0 }
-          ]
-        },
-        {
-          nombre: 'Interacción',
-          habilidades: [
-            { id: 'intimidacion', nombre: 'Intimidación', valor: 0 },
-            { id: 'liderazgo', nombre: 'Liderazgo', valor: 0 },
-            { id: 'subterfugio', nombre: 'Subterfugio', valor: 0 }
-          ]
+          nombre: 'Sociales',
+          habilidades: []
         }
       ],
       fisicas: [
         {
-          nombre: 'Combate',
-          habilidades: [
-            { id: 'armas_cc', nombre: 'Armas C/C', valor: 0 },
-            { id: 'armas_fuego', nombre: 'Armas de Fuego', valor: 0 },
-            { id: 'pelea', nombre: 'Pelea', valor: 0 }
-          ]
-        },
-        {
-          nombre: 'Movimiento',
-          habilidades: [
-            { id: 'atletismo', nombre: 'Atletismo', valor: 0 },
-            { id: 'pilotaje', nombre: 'Pilotaje', valor: 0 },
-            { id: 'sigilo', nombre: 'Sigilo', valor: 0 }
-          ]
+          nombre: 'Físicas',
+          habilidades: []
         }
       ]
     },
-    méritos: [],
+    meritos: [],
+    defectos: [],
     característicasDuales: {
       personalidad: {
         nombre1: 'Introvertido',
@@ -96,12 +61,27 @@ export default {
       }
     },
     ACTUALIZAR_HABILIDAD(state, { tipo, id, valor }) {
-      state.habilidades[tipo].forEach(grupo => {
-        const habilidad = grupo.habilidades.find(h => h.id === id)
-        if (habilidad) {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      state.habilidades[tipoHabilidad][0].habilidades.forEach(habilidad => {
+        if (habilidad.id === id) {
           habilidad.valor = valor
         }
       })
+    },
+    AGREGAR_HABILIDAD(state, { tipo, nombre }) {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      const id = nombre.toLowerCase().replace(/\s+/g, '_')
+      state.habilidades[tipoHabilidad][0].habilidades.push({
+        id,
+        nombre,
+        valor: 0,
+        especializaciones: []
+      })
+    },
+    ELIMINAR_HABILIDAD(state, { tipo, id }) {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      state.habilidades[tipoHabilidad][0].habilidades = 
+        state.habilidades[tipoHabilidad][0].habilidades.filter(h => h.id !== id)
     },
     ACTUALIZAR_CARACTERISTICA_DUAL(state, { tipo, campo, valor }) {
       if (tipo === 'personalidad') {
@@ -109,22 +89,89 @@ export default {
       } else if (tipo === 'moral') {
         state.característicasDuales.moral.valorVirtud = valor
       }
+    },
+    AGREGAR_MERITO(state, merito) {
+      state.meritos.push(merito)
+    },
+    ACTUALIZAR_NIVEL_MERITO(state, { id, nivel }) {
+      const merito = state.meritos.find(m => m.id === id)
+      if (merito) {
+        merito.nivel = nivel
+      }
+    },
+    ELIMINAR_MERITO(state, id) {
+      state.meritos = state.meritos.filter(m => m.id !== id)
+    },
+    AGREGAR_ESPECIALIZACION(state, { tipo, habilidadId, especializacion }) {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      const habilidad = state.habilidades[tipoHabilidad][0].habilidades.find(h => h.id === habilidadId)
+      if (habilidad && habilidad.valor >= 3) {
+        habilidad.especializaciones.push(especializacion)
+      }
+    },
+    ELIMINAR_ESPECIALIZACION(state, { tipo, habilidadId, especializacion }) {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      const habilidad = state.habilidades[tipoHabilidad][0].habilidades.find(h => h.id === habilidadId)
+      if (habilidad) {
+        habilidad.especializaciones = habilidad.especializaciones.filter(e => e !== especializacion)
+      }
+    },
+    AGREGAR_DEFECTO(state, defecto) {
+      state.defectos.push(defecto)
+    },
+    ELIMINAR_DEFECTO(state, id) {
+      state.defectos = state.defectos.filter(d => d.id !== id)
     }
   },
   actions: {
-    actualizarAtributo({ commit }, payload) {
-      commit('ACTUALIZAR_ATRIBUTO', payload)
+    actualizarAtributo({ commit }, { tipo, id, valor }) {
+      commit('ACTUALIZAR_ATRIBUTO', { tipo, id, valor })
     },
     actualizarHabilidad({ commit }, payload) {
       commit('ACTUALIZAR_HABILIDAD', payload)
     },
+    agregarHabilidad({ commit }, payload) {
+      commit('AGREGAR_HABILIDAD', payload)
+    },
+    eliminarHabilidad({ commit }, payload) {
+      commit('ELIMINAR_HABILIDAD', payload)
+    },
     actualizarCaracteristicaDual({ commit }, payload) {
       commit('ACTUALIZAR_CARACTERISTICA_DUAL', payload)
+    },
+    agregarMerito({ commit }, merito) {
+      commit('AGREGAR_MERITO', merito)
+    },
+    actualizarNivelMerito({ commit }, { id, nivel }) {
+      commit('ACTUALIZAR_NIVEL_MERITO', { id, nivel })
+    },
+    eliminarMerito({ commit }, id) {
+      commit('ELIMINAR_MERITO', id)
+    },
+    agregarEspecializacion({ commit }, payload) {
+      commit('AGREGAR_ESPECIALIZACION', payload)
+    },
+    eliminarEspecializacion({ commit }, payload) {
+      commit('ELIMINAR_ESPECIALIZACION', payload)
+    },
+    agregarDefecto({ commit }, defecto) {
+      commit('AGREGAR_DEFECTO', defecto)
+    },
+    eliminarDefecto({ commit }, id) {
+      commit('ELIMINAR_DEFECTO', id)
     }
   },
   getters: {
-    atributosPorTipo: (state) => (tipo) => state.atributos[tipo],
-    habilidadesPorTipo: (state) => (tipo) => state.habilidades[tipo],
-    caracteristicasDuales: (state) => state.característicasDuales
+    getAtributos: state => state.atributos,
+    getAtributosMentales: state => state.atributos.mentales,
+    getAtributosSociales: state => state.atributos.sociales,
+    getAtributosFisicos: state => state.atributos.fisicos,
+    habilidadesPorTipo: (state) => (tipo) => {
+      const tipoHabilidad = tipo === 'fisicos' ? 'fisicas' : tipo
+      return state.habilidades[tipoHabilidad] || []
+    },
+    caracteristicasDuales: (state) => state.característicasDuales,
+    meritos: state => state.meritos,
+    defectos: state => state.defectos
   }
 } 
