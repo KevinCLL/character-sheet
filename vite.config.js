@@ -5,13 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
-    vue({
-      script: {
-        defineModel: true,
-        propsDestructure: true
-      }
-    }),
-    tailwindcss()
+    vue(),
+    tailwindcss(),
   ],
   resolve: {
     alias: {

@@ -213,7 +213,9 @@ const createDynamicItemMutations = (state, path, payload) => {
 export default createStore({
   state: {
     personajeActual: null,
-    modoOscuro: false,
+    modoOscuro: localStorage.getItem('darkMode') === 'true' || 
+                (!('darkMode' in localStorage) && 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches),
     configuracion: {
       autoGuardado: true,
       intervaloGuardado: 5, // minutos
@@ -226,6 +228,7 @@ export default createStore({
     },
     TOGGLE_MODO_OSCURO(state) {
       state.modoOscuro = !state.modoOscuro;
+      localStorage.setItem('darkMode', state.modoOscuro);
     },
     ACTUALIZAR_CONFIGURACION(state, config) {
       state.configuracion = { ...state.configuracion, ...config };
