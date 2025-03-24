@@ -1,5 +1,10 @@
 // store/index.js
 import { createStore } from 'vuex';
+import ego from './modules/ego';
+import morfo from './modules/morfo';
+import avatar from './modules/avatar';
+import historia from './modules/historia';
+import personaje from './modules/personaje';
 
 // Constantes para valores por defecto
 const DEFAULT_ATTRIBUTES = {
@@ -206,97 +211,25 @@ const createDynamicItemMutations = (state, path, payload) => {
 
 // Create and export the Vuex store
 export default createStore({
-  state() {
-    const initialState = {
-      ego: {
-        name: '',
-        mentalAge: '',
-        attributes: { ...DEFAULT_ATTRIBUTES },
-        skills: {
-          mental: [
-            { name: 'Académicas', value: 0, specialty: '' },
-            { name: 'Informática', value: 0, specialty: '' },
-            { name: 'Artesanía', value: 0, specialty: '' },
-            { name: 'Investigación', value: 0, specialty: '' },
-            { name: 'Medicina', value: 0, specialty: '' },
-            { name: 'Ocultismo', value: 0, specialty: '' },
-            { name: 'Política', value: 0, specialty: '' },
-            { name: 'Ciencia', value: 0, specialty: '' }
-          ],
-          physical: [
-            { name: 'Atletismo', value: 0, specialty: '' },
-            { name: 'Pelea', value: 0, specialty: '' },
-            { name: 'Conducir', value: 0, specialty: '' },
-            { name: 'Armas de Fuego', value: 0, specialty: '' },
-            { name: 'Hurto', value: 0, specialty: '' },
-            { name: 'Sigilo', value: 0, specialty: '' },
-            { name: 'Supervivencia', value: 0, specialty: '' },
-            { name: 'Armas Blancas', value: 0, specialty: '' }
-          ],
-          social: [
-            { name: 'Trato con Animales', value: 0, specialty: '' },
-            { name: 'Empatía', value: 0, specialty: '' },
-            { name: 'Expresión', value: 0, specialty: '' },
-            { name: 'Intimidación', value: 0, specialty: '' },
-            { name: 'Persuasión', value: 0, specialty: '' },
-            { name: 'Sociabilidad', value: 0, specialty: '' },
-            { name: 'Callejeo', value: 0, specialty: '' },
-            { name: 'Subterfugio', value: 0, specialty: '' }
-          ]
-        },
-        traits: [
-          { name: '', value: 0 },
-          { name: '', value: 0 },
-          { name: '', value: 0 },
-          { name: '', value: 0 }
-        ],
-        dualCharacteristics: {
-          personal: {
-            left: 'Idealismo',
-            right: 'Cinismo',
-            value: 5
-          },
-          moral: {
-            left: '',
-            right: '',
-            value: 5
-          }
-        }
-      },
-      morfos: [],
-      activeMorfoId: null,
-      avatar: {
-        player: '',
-        concept: '',
-        virtue: '',
-        vice: '',
-        willpower: {
-          max: 5,
-          current: 5
-        },
-        integrity: {
-          value: 7
-        },
-        synchronization: {
-          value: 3,
-          effect: ''
-        },
-        conditions: [],
-        notes: ''
-      },
-      history: {
-        background: '',
-        relationships: [],
-        goals: [],
-        notes: ''
-      }
-    };
-
-    ensureStoreState(initialState);
-    return initialState;
+  state: {
+    personajeActual: null,
+    modoOscuro: false,
+    configuracion: {
+      autoGuardado: true,
+      intervaloGuardado: 5, // minutos
+      ultimoGuardado: null
+    }
   },
-
   mutations: {
+    SET_PERSONAJE_ACTUAL(state, personaje) {
+      state.personajeActual = personaje;
+    },
+    TOGGLE_MODO_OSCURO(state) {
+      state.modoOscuro = !state.modoOscuro;
+    },
+    ACTUALIZAR_CONFIGURACION(state, config) {
+      state.configuracion = { ...state.configuracion, ...config };
+    },
     updateEgo(state, { path, value }) {
       try {
         const parts = path.split('.');
@@ -310,7 +243,6 @@ export default createStore({
         throw error;
       }
     },
-
     addMorfo(state, morfoData = {}) {
       try {
         const newMorfo = {
@@ -347,7 +279,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeMorfo(state, morfoId) {
       try {
         const index = state.morfos.findIndex(m => m.id === morfoId);
@@ -362,7 +293,6 @@ export default createStore({
         throw error;
       }
     },
-
     setActiveMorfo(state, morfoId) {
       try {
         if (state.morfos.some(m => m.id === morfoId)) {
@@ -373,7 +303,6 @@ export default createStore({
         throw error;
       }
     },
-
     updateMorfo(state, { morfoId, path, value }) {
       try {
         const morfo = state.morfos.find(m => m.id === morfoId);
@@ -390,7 +319,6 @@ export default createStore({
         throw error;
       }
     },
-
     updateAvatar(state, { path, value }) {
       try {
         const parts = path.split('.');
@@ -404,7 +332,6 @@ export default createStore({
         throw error;
       }
     },
-
     updateHistory(state, { path, value }) {
       try {
         const parts = path.split('.');
@@ -418,7 +345,6 @@ export default createStore({
         throw error;
       }
     },
-
     loadCharacterData(state, data) {
       try {
         if (!data) return;
@@ -438,8 +364,22 @@ export default createStore({
       }
     }
   },
-
   actions: {
+    inicializarPersonaje({ commit }, datos) {
+      commit('SET_PERSONAJE_ACTUAL', datos);
+    },
+    guardarPersonaje({ state }) {
+      if (state.configuracion.autoGuardado) {
+        localStorage.setItem('personaje', JSON.stringify(state.personajeActual));
+        state.configuracion.ultimoGuardado = new Date();
+      }
+    },
+    cargarPersonaje({ commit }) {
+      const personajeGuardado = localStorage.getItem('personaje');
+      if (personajeGuardado) {
+        commit('SET_PERSONAJE_ACTUAL', JSON.parse(personajeGuardado));
+      }
+    },
     loadCharacter({ commit }, data) {
       try {
         commit('loadCharacterData', data);
@@ -448,7 +388,6 @@ export default createStore({
         throw error;
       }
     },
-
     addSkill({ commit }, { category, name = '' }) {
       try {
         commit('updateEgo', {
@@ -460,7 +399,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeSkill({ commit }, { category, index }) {
       try {
         const skills = [...state.ego.skills[category]];
@@ -474,7 +412,6 @@ export default createStore({
         throw error;
       }
     },
-
     updateSkill({ commit }, { category, index, field, value }) {
       try {
         const skills = [...state.ego.skills[category]];
@@ -488,7 +425,6 @@ export default createStore({
         throw error;
       }
     },
-
     addTrait({ commit }) {
       try {
         commit('updateEgo', {
@@ -500,7 +436,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeTrait({ commit }, index) {
       try {
         const traits = [...state.ego.traits];
@@ -514,7 +449,6 @@ export default createStore({
         throw error;
       }
     },
-
     addNewMorfo({ commit }, morfoData) {
       try {
         commit('addMorfo', morfoData);
@@ -523,7 +457,6 @@ export default createStore({
         throw error;
       }
     },
-
     deleteMorfo({ commit }, morfoId) {
       try {
         commit('removeMorfo', morfoId);
@@ -532,7 +465,6 @@ export default createStore({
         throw error;
       }
     },
-
     switchMorfo({ commit }, morfoId) {
       try {
         commit('setActiveMorfo', morfoId);
@@ -541,7 +473,6 @@ export default createStore({
         throw error;
       }
     },
-
     addPower({ commit, state }, { morfoId, power }) {
       try {
         const morfo = state.morfos.find(m => m.id === morfoId);
@@ -557,7 +488,6 @@ export default createStore({
         throw error;
       }
     },
-
     removePower({ commit, state }, { morfoId, index }) {
       try {
         const morfo = state.morfos.find(m => m.id === morfoId);
@@ -575,7 +505,6 @@ export default createStore({
         throw error;
       }
     },
-
     addRelationship({ commit }) {
       try {
         commit('updateHistory', {
@@ -587,7 +516,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeRelationship({ commit }, index) {
       try {
         const relationships = [...state.history.relationships];
@@ -601,7 +529,6 @@ export default createStore({
         throw error;
       }
     },
-
     updateRelationship({ commit }, { index, field, value }) {
       try {
         const relationships = [...state.history.relationships];
@@ -615,7 +542,6 @@ export default createStore({
         throw error;
       }
     },
-
     addGoal({ commit }) {
       try {
         commit('updateHistory', {
@@ -627,7 +553,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeGoal({ commit }, index) {
       try {
         const goals = [...state.history.goals];
@@ -641,7 +566,6 @@ export default createStore({
         throw error;
       }
     },
-
     addCondition({ commit }) {
       try {
         commit('updateAvatar', {
@@ -653,7 +577,6 @@ export default createStore({
         throw error;
       }
     },
-
     removeCondition({ commit }, index) {
       try {
         const conditions = [...state.avatar.conditions];
@@ -668,12 +591,10 @@ export default createStore({
       }
     }
   },
-
   getters: {
     activeMorfo(state) {
       return state.morfos.find(m => m.id === state.activeMorfoId);
     },
-
     effectiveAttributes(state, getters) {
       const ego = state.ego;
       const activeMorfo = getters.activeMorfo;
@@ -692,7 +613,6 @@ export default createStore({
         stamina: activeMorfo.attributes.stamina
       };
     },
-
     effectiveSkills(state, getters) {
       const ego = state.ego;
       const activeMorfo = getters.activeMorfo;
@@ -720,7 +640,6 @@ export default createStore({
       
       return skills;
     },
-
     derivedStats(state, getters) {
       const activeMorfo = getters.activeMorfo;
       if (!activeMorfo) return null;
@@ -736,5 +655,12 @@ export default createStore({
         health: stamina + Math.floor(strength / 2)
       };
     }
+  },
+  modules: {
+    ego,
+    morfo,
+    avatar,
+    historia,
+    personaje
   }
 });
