@@ -1,114 +1,130 @@
 export default {
   namespaced: true,
   state: {
-    atributosMentales: {
-      inteligencia: 0,
-      astucia: 0,
-      resolucion: 0
-    },
-    atributosSociales: {
-      presencia: 0,
-      manipulacion: 0,
-      compostura: 0
+    atributos: {
+      mentales: [
+        { id: 'intelecto', nombre: 'Intelecto', valor: 1 },
+        { id: 'astucia', nombre: 'Astucia', valor: 1 },
+        { id: 'determinacion', nombre: 'Determinación', valor: 1 }
+      ],
+      sociales: [
+        { id: 'presencia', nombre: 'Presencia', valor: 1 },
+        { id: 'manipulacion', nombre: 'Manipulación', valor: 1 },
+        { id: 'compostura', nombre: 'Compostura', valor: 1 }
+      ],
+      fisicos: [
+        { id: 'fuerza', nombre: 'Fuerza', valor: 1 },
+        { id: 'destreza', nombre: 'Destreza', valor: 1 },
+        { id: 'resistencia', nombre: 'Resistencia', valor: 1 }
+      ]
     },
     habilidades: {
       mentales: [
-        { nombre: "academicismo", nivel: 0, especialidades: [] },
-        { nombre: "informatica", nivel: 0, especialidades: [] },
-        { nombre: "investigacion", nivel: 0, especialidades: [] },
-        { nombre: "medicina", nivel: 0, especialidades: [] },
-        { nombre: "ocultismo", nivel: 0, especialidades: [] },
-        { nombre: "politica", nivel: 0, especialidades: [] },
-        { nombre: "ciencia", nivel: 0, especialidades: [] }
+        {
+          nombre: 'Académicas',
+          habilidades: [
+            { id: 'ciencias', nombre: 'Ciencias', valor: 0 },
+            { id: 'humanidades', nombre: 'Humanidades', valor: 0 },
+            { id: 'medicina', nombre: 'Medicina', valor: 0 }
+          ]
+        },
+        {
+          nombre: 'Técnicas',
+          habilidades: [
+            { id: 'informatica', nombre: 'Informática', valor: 0 },
+            { id: 'ingenieria', nombre: 'Ingeniería', valor: 0 },
+            { id: 'investigacion', nombre: 'Investigación', valor: 0 }
+          ]
+        }
       ],
       sociales: [
-        { nombre: "empatia", nivel: 0, especialidades: [] },
-        { nombre: "persuasion", nivel: 0, especialidades: [] },
-        { nombre: "intimidacion", nivel: 0, especialidades: [] },
-        { nombre: "subterfugio", nivel: 0, especialidades: [] },
-        { nombre: "callejeo", nivel: 0, especialidades: [] }
+        {
+          nombre: 'Comunicación',
+          habilidades: [
+            { id: 'empatia', nombre: 'Empatía', valor: 0 },
+            { id: 'expresion', nombre: 'Expresión', valor: 0 },
+            { id: 'persuasion', nombre: 'Persuasión', valor: 0 }
+          ]
+        },
+        {
+          nombre: 'Interacción',
+          habilidades: [
+            { id: 'intimidacion', nombre: 'Intimidación', valor: 0 },
+            { id: 'liderazgo', nombre: 'Liderazgo', valor: 0 },
+            { id: 'subterfugio', nombre: 'Subterfugio', valor: 0 }
+          ]
+        }
       ],
       fisicas: [
-        { nombre: "atletismo", nivel: 0, especialidades: [] },
-        { nombre: "pelea", nivel: 0, especialidades: [] },
-        { nombre: "conducir", nivel: 0, especialidades: [] },
-        { nombre: "armas", nivel: 0, especialidades: [] },
-        { nombre: "sigilo", nivel: 0, especialidades: [] }
+        {
+          nombre: 'Combate',
+          habilidades: [
+            { id: 'armas_cc', nombre: 'Armas C/C', valor: 0 },
+            { id: 'armas_fuego', nombre: 'Armas de Fuego', valor: 0 },
+            { id: 'pelea', nombre: 'Pelea', valor: 0 }
+          ]
+        },
+        {
+          nombre: 'Movimiento',
+          habilidades: [
+            { id: 'atletismo', nombre: 'Atletismo', valor: 0 },
+            { id: 'pilotaje', nombre: 'Pilotaje', valor: 0 },
+            { id: 'sigilo', nombre: 'Sigilo', valor: 0 }
+          ]
+        }
       ]
     },
-    meritos: [],
-    caracteristicasDuales: {
+    méritos: [],
+    característicasDuales: {
       personalidad: {
-        nombre1: "Idealismo",
-        valor1: 5,
-        nombre2: "Cinismo",
-        valor2: 5
+        nombre1: 'Introvertido',
+        nombre2: 'Extrovertido',
+        valor1: 5
       },
       moral: {
-        virtud: "Valor",
-        valorVirtud: 5,
-        vicio: "Imprudencia",
-        valorVicio: 5
+        virtud: 'Compasión',
+        vicio: 'Crueldad',
+        valorVirtud: 5
       }
     }
   },
   mutations: {
-    ACTUALIZAR_ATRIBUTO_MENTAL(state, { atributo, valor }) {
-      state.atributosMentales[atributo] = valor
+    ACTUALIZAR_ATRIBUTO(state, { tipo, id, valor }) {
+      const atributo = state.atributos[tipo].find(a => a.id === id)
+      if (atributo) {
+        atributo.valor = valor
+      }
     },
-    ACTUALIZAR_ATRIBUTO_SOCIAL(state, { atributo, valor }) {
-      state.atributosSociales[atributo] = valor
-    },
-    ACTUALIZAR_HABILIDAD(state, { categoria, index, campo, valor }) {
-      state.habilidades[categoria][index][campo] = valor
-    },
-    AGREGAR_ESPECIALIDAD(state, { categoria, index, especialidad }) {
-      state.habilidades[categoria][index].especialidades.push(especialidad)
-    },
-    ELIMINAR_ESPECIALIDAD(state, { categoria, index, especialidadIndex }) {
-      state.habilidades[categoria][index].especialidades.splice(especialidadIndex, 1)
-    },
-    AGREGAR_MERITO(state, merito) {
-      state.meritos.push(merito)
-    },
-    ELIMINAR_MERITO(state, index) {
-      state.meritos.splice(index, 1)
+    ACTUALIZAR_HABILIDAD(state, { tipo, id, valor }) {
+      state.habilidades[tipo].forEach(grupo => {
+        const habilidad = grupo.habilidades.find(h => h.id === id)
+        if (habilidad) {
+          habilidad.valor = valor
+        }
+      })
     },
     ACTUALIZAR_CARACTERISTICA_DUAL(state, { tipo, campo, valor }) {
-      state.caracteristicasDuales[tipo][campo] = valor
+      if (tipo === 'personalidad') {
+        state.característicasDuales.personalidad.valor1 = valor
+      } else if (tipo === 'moral') {
+        state.característicasDuales.moral.valorVirtud = valor
+      }
     }
   },
   actions: {
-    actualizarAtributoMental({ commit }, payload) {
-      commit('ACTUALIZAR_ATRIBUTO_MENTAL', payload)
-    },
-    actualizarAtributoSocial({ commit }, payload) {
-      commit('ACTUALIZAR_ATRIBUTO_SOCIAL', payload)
+    actualizarAtributo({ commit }, payload) {
+      commit('ACTUALIZAR_ATRIBUTO', payload)
     },
     actualizarHabilidad({ commit }, payload) {
       commit('ACTUALIZAR_HABILIDAD', payload)
-    },
-    agregarEspecialidad({ commit }, payload) {
-      commit('AGREGAR_ESPECIALIDAD', payload)
-    },
-    eliminarEspecialidad({ commit }, payload) {
-      commit('ELIMINAR_ESPECIALIDAD', payload)
-    },
-    agregarMerito({ commit }, merito) {
-      commit('AGREGAR_MERITO', merito)
-    },
-    eliminarMerito({ commit }, index) {
-      commit('ELIMINAR_MERITO', index)
     },
     actualizarCaracteristicaDual({ commit }, payload) {
       commit('ACTUALIZAR_CARACTERISTICA_DUAL', payload)
     }
   },
   getters: {
-    obtenerAtributosMentales: state => state.atributosMentales,
-    obtenerAtributosSociales: state => state.atributosSociales,
-    obtenerHabilidades: state => state.habilidades,
-    obtenerMeritos: state => state.meritos,
-    obtenerCaracteristicasDuales: state => state.caracteristicasDuales
+    atributosPorTipo: (state) => (tipo) => state.atributos[tipo],
+    habilidadesPorTipo: (state) => (tipo) => state.habilidades[tipo],
+    caracteristicasDuales: (state) => state.característicasDuales
   }
 } 

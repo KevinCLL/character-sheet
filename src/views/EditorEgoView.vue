@@ -1,14 +1,36 @@
 <template>
-  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-      Editor de EGO
-    </h1>
-    <p class="text-gray-600 dark:text-gray-300">
-      Aquí podrás editar los atributos mentales y sociales de tu personaje.
-    </p>
+  <div class="container mx-auto px-4 py-8">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-8">Editor de EGO</h2>
+    
+    <!-- Atributos -->
+    <section class="mb-12">
+      <Atributos />
+    </section>
+
+    <!-- Habilidades -->
+    <section class="mb-12">
+      <div class="space-y-8">
+        <GrupoHabilidades tipo="mentales" />
+        <GrupoHabilidades tipo="sociales" />
+        <GrupoHabilidades tipo="fisicas" />
+      </div>
+    </section>
+
+    <!-- Características Duales -->
+    <section class="mb-12">
+      <CaracteristicasDuales />
+    </section>
   </div>
 </template>
 
+<script>
+export default {
+  name: 'EditorEgoView'
+}
+</script>
+
 <script setup>
-// El componente está vacío por ahora
+import Atributos from '@/components/ego/Atributos.vue'
+import GrupoHabilidades from '@/components/ego/GrupoHabilidades.vue'
+import CaracteristicasDuales from '@/components/ego/CaracteristicasDuales.vue'
 </script> 

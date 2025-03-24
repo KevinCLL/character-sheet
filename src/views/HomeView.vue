@@ -9,6 +9,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: 'HomeView'
+}
+</script>
+
 <script setup>
 // El componente está vacío por ahora
 </script> 
